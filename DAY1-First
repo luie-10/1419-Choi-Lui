@@ -11,9 +11,16 @@ namespace MyFirstApp
             float monsterHP = 100;
             bool isDefending = false;
             float PlayerAK = 10;
+            float MonsterAK = 10;
+            int turnCount = 1;
             while (playerHP > 0 && monsterHP > 0)
             {
                 Console.WriteLine("\n--------------------------------");
+                if (turnCount % 3 == 0)
+                {
+                    Console.WriteLine("몬스터가 공격성이 강화 되었습니다!");
+                    MonsterAK += 3;
+                }
                 Console.WriteLine($"플레이어 HP: {playerHP} | 몬스터 HP: {monsterHP}");
                 Console.Write("공격 (A) / 회복 (H) / 방어 (D) / 아이템 (I) : ");
 
@@ -24,7 +31,7 @@ namespace MyFirstApp
 
                 if (monsterHP > 0)
                 {
-                    Monster(ref playerHP, ref isDefending);
+                    Monster(ref playerHP, ref isDefending, ref MonsterAK, ref turnCount);
                 }
             }
 
@@ -108,10 +115,10 @@ namespace MyFirstApp
             }
         }
 
-        static void Monster(ref float playerHP, ref bool isDefending)
+        static void Monster(ref float playerHP, ref bool isDefending, ref float MonsterAK, ref int turnCount)
         {
             Random random = new Random();
-            int attackDamage = random.Next(1, 10);
+            int attackDamage = random.Next((int)MonsterAK - 5, (int)MonsterAK + 5);
             if (isDefending)
             {
                 attackDamage /= 2; // 방어 상태에서는 받는 데미지 절반
@@ -121,10 +128,12 @@ namespace MyFirstApp
             {
                 Console.WriteLine($"Monster가 공격했습니다 하지만 방어를 해 데미지가 1/2가 되었습니다. (데미지: {attackDamage})");
                 isDefending = false; // 방어 상태 해제
+                turnCount++;
             }
             else
             {
                 Console.WriteLine($"Monster가 공격했습니다 (데미지: {attackDamage})");
+                turnCount++;
             }
         }
     }
