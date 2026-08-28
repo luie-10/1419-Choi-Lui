@@ -44,7 +44,14 @@ namespace MyFirstApp
 
             if (choice == 'A')
             {
-                int attackDamage = random.Next((int)PlayerAK - 9, (int)PlayerAK + 1);
+                int criticalChance = random.Next(1, 101); // 1~100 사이의 랜덤 값 생성
+
+                int attackDamage = random.Next((int)PlayerAK - 9, (int)PlayerAK + 2);
+                if (criticalChance <= 20) // 20% 확률로 크리티컬 히트
+                {
+                    attackDamage *= 2;
+                    Console.WriteLine("크리티컬 히트!");
+                }
                 monsterHP -= attackDamage;
                 Console.WriteLine($"몬스터에게 {attackDamage}의 데미지를 입혔습니다");
             }
