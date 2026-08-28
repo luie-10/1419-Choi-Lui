@@ -9,21 +9,21 @@ namespace MyFirstApp
             Console.WriteLine("GAME START");
             float playerHP = 100;
             float monsterHP = 100;
-
+            bool isDefending = false;
             while (playerHP > 0 && monsterHP > 0)
             {
                 Console.WriteLine("\n--------------------------------");
                 Console.WriteLine($"플레이어 HP: {playerHP} | 몬스터 HP: {monsterHP}");
-                Console.Write("공격 (A) / 회복 (H): ");
+                Console.Write("공격 (A) / 회복 (H) / 방어 (D) / 아이템 (I) : ");
 
                 char choice = char.ToUpper(Console.ReadKey().KeyChar);
                 Console.WriteLine();
 
-                Player(choice, ref playerHP, ref monsterHP);
+                Player(choice, ref playerHP, ref monsterHP, ref isDefending);
 
                 if (monsterHP > 0)
                 {
-                    Monster(ref playerHP);
+                    Monster(ref playerHP, ref isDefending);
                 }
             }
 
@@ -37,7 +37,7 @@ namespace MyFirstApp
             }
         }
 
-        static void Player(char choice, ref float nowPlayerHP, ref float monsterHP)
+        static void Player(char choice, ref float nowPlayerHP, ref float monsterHP, ref bool isDefending)
         {
             Random random = new Random();
 
@@ -53,18 +53,39 @@ namespace MyFirstApp
                 nowPlayerHP += healAmount;
                 Console.WriteLine($"체력을 {healAmount} 회복했습니다");
             }
+            else if (choice == 'D')
+            {
+                isDefending = true;
+                Console.WriteLine("방어 상태가 되었습니다.");
+            }
             else
             {
                 Console.WriteLine("잘못된 입력입니다.");
             }
+            
         }
 
-        static void Monster(ref float playerHP)
+        static void Monster(ref float playerHP, ref bool isDefending)
         {
             Random random = new Random();
             int attackDamage = random.Next(1, 10);
+            if (isDefending)
+            {
+                attackDamage /= 2; // 방어 상태에서는 받는 데미지 절반
+                
+            }
             playerHP -= attackDamage;
-            Console.WriteLine($"Monster가 공격했습니다 (데미지: {attackDamage})");
+            if (isDefending)
+            {
+                Console.WriteLine($"Monster가 공격했습니다 하지만 방어를 해 데미지가 1/2가 되었습니다. (데미지: {attackDamage})");
+                isDefending = false; // 방어 상태 해제
+            }
+            else
+            {
+                Console.WriteLine($"Monster가 공격했습니다 (데미지: {attackDamage})");
+
+
+            }
         }
     }
 }
