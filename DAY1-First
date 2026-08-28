@@ -30,10 +30,11 @@ namespace MyFirstApp
             if (playerHP <= 0)
             {
                 Console.WriteLine("\n패배했습니다... GAME OVER");
+                
             }
             else if (monsterHP <= 0)
             {
-                Console.WriteLine("\n축하합니다! 몬스터를 처치했습니다!");
+                Console.WriteLine("\n축하합니다 몬스터를 처치했습니다");
             }
         }
 
