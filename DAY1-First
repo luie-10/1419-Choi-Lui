@@ -2,79 +2,106 @@ using System;
 
 namespace MyFirstApp
 {
+    class Unit
+    {
+        public string Name { get; set; }
+        public float MaxHP { get; set; }
+        public float NowHP { get; set; }
+        public float AttackPower { get; set; }
+
+        public Unit(string name, float hp, float attackPower)
+        {
+            Name = name;
+            MaxHP = hp;
+            NowHP = hp;
+            AttackPower = attackPower;
+        }
+
+        public bool IsDead => NowHP <= 0;
+
+        public void TakeDamage(float damage)
+        {
+            NowHP -= damage;
+            if (NowHP < 0) NowHP = 0;
+        }
+
+        public void Heal(float amount)
+        {
+            NowHP += amount;
+            if (NowHP > MaxHP) NowHP = MaxHP;
+        }
+    }
+
     internal class Program
     {
         static void Main(string[] args)
         {
             Console.WriteLine("GAME START");
-            float playerNowHP = 100;
-            float playerMaxHP = 100;
-            float monsterHP = 100;
-            float monsterMaxHP = 100;
+
+            Unit player = new Unit("플레이어", 100, 10);
+            Unit monster = new Unit("몬스터", 100, 10);
+
             bool isDefending = false;
-            float PlayerAK = 10;
-            float MonsterAK = 10;
             int turnCount = 1;
-            
-            while (playerNowHP > 0 && monsterHP > 0)
+
+            while (!player.IsDead && !monster.IsDead)
             {
                 Console.WriteLine("\n--------------------------------");
                 if (turnCount % 3 == 0)
                 {
                     Console.WriteLine("몬스터가 공격성이 강화 되었습니다!");
-                    MonsterAK += 3;
+                    monster.AttackPower += 3;
                 }
-                Console.WriteLine($"플레이어 HP: {playerNowHP}/{playerMaxHP} | 몬스터 HP: {monsterHP}/{monsterMaxHP}");
+
+                Console.WriteLine($"플레이어 HP: {player.NowHP}/{player.MaxHP} | 몬스터 HP: {monster.NowHP}/{monster.MaxHP}");
                 Console.Write("공격 (A) / 회복 (H) / 방어 (D) / 아이템 (I) : ");
 
                 char choice = char.ToUpper(Console.ReadKey().KeyChar);
                 Console.WriteLine();
 
-                Player(choice, ref playerNowHP, ref monsterHP, ref isDefending, ref PlayerAK, ref playerMaxHP);
+                PlayerTurn(choice, player, monster, ref isDefending);
 
-                if (monsterHP > 0)
+                if (!monster.IsDead)
                 {
-                    Monster(ref playerNowHP, ref isDefending, ref MonsterAK, ref turnCount);
+                    MonsterTurn(player, monster, ref isDefending, ref turnCount);
                 }
             }
 
-            if (playerNowHP <= 0)
+            if (player.IsDead)
             {
                 Console.WriteLine("\n패배했습니다... GAME OVER");
             }
-            else if (monsterHP <= 0)
+            else if (monster.IsDead)
             {
                 Console.WriteLine("\n축하합니다! 몬스터를 처치했습니다!");
             }
         }
 
-        static void Player(char choice, ref float nowPlayerHP, ref float monsterHP, ref bool isDefending, ref float PlayerAK, ref float playerMaxHP)
+        static void PlayerTurn(char choice, Unit player, Unit monster, ref bool isDefending)
         {
             Random random = new Random();
 
             if (choice == 'A')
             {
-                int criticalChance = random.Next(1, 101); // 1~100 사이의 랜덤 값 생성
+                int criticalChance = random.Next(1, 101);
+                int attackDamage = random.Next((int)player.AttackPower - 9, (int)player.AttackPower + 2);
 
-                int attackDamage = random.Next((int)PlayerAK - 9, (int)PlayerAK + 2);
-                if (criticalChance <= 20) // 20% 확률로 크리티컬 히트
+                if (criticalChance <= 20)
                 {
                     attackDamage *= 2;
                     Console.WriteLine("크리티컬 히트!");
                 }
-                monsterHP -= attackDamage;
+
+                monster.TakeDamage(attackDamage);
                 Console.WriteLine($"몬스터에게 {attackDamage}의 데미지를 입혔습니다");
             }
             else if (choice == 'H')
             {
-                int healAmount = 10;
-                nowPlayerHP += healAmount;
-                if (nowPlayerHP > playerMaxHP)
-                {
-                    nowPlayerHP = playerMaxHP; // 최대 체력 초과 방지
-                }
-                healAmount = (int)(nowPlayerHP > playerMaxHP ? playerMaxHP - (nowPlayerHP - healAmount) : healAmount);
-                Console.WriteLine($"체력을 {healAmount} 회복했습니다");
+                float beforeHP = player.NowHP;
+                player.Heal(10);
+                float actualHealed = player.NowHP - beforeHP;
+
+                Console.WriteLine($"체력을 {actualHealed} 회복했습니다");
             }
             else if (choice == 'D')
             {
@@ -83,38 +110,34 @@ namespace MyFirstApp
             }
             else if (choice == 'I')
             {
-                
                 Console.Write("광폭화 포션(F) / 날카로운 포션(N) : ");
                 char itemChoice = char.ToUpper(Console.ReadKey().KeyChar);
                 Console.WriteLine();
 
-                
-                Item(itemChoice, ref PlayerAK, ref monsterHP);
+                Item(itemChoice, player, monster);
             }
             else
             {
                 Console.WriteLine("잘못된 입력입니다.");
             }
-
         }
 
-        static void Item(char itemChoice, ref float PlayerAK, ref float monsterHP)
+        static void Item(char itemChoice, Unit player, Unit monster)
         {
             Random random = new Random();
 
             if (itemChoice == 'F')
             {
-                PlayerAK += 5;
+                player.AttackPower += 5;
                 Console.WriteLine("광폭화 포션을 사용하여 공격력이 증가했습니다.");
             }
             else if (itemChoice == 'N')
             {
-                PlayerAK += 10;
+                player.AttackPower += 10;
                 Console.WriteLine("날카로운 포션을 사용하여 공격력이 증가했습니다.");
 
-                
-                int attackDamage = random.Next((int)PlayerAK - 5, (int)PlayerAK - 2);
-                monsterHP -= attackDamage;
+                int attackDamage = random.Next((int)player.AttackPower - 5, (int)player.AttackPower - 2);
+                monster.TakeDamage(attackDamage);
                 Console.WriteLine($"날카로운 포션의 효과로 몬스터에게 {attackDamage}의 데미지를 입혔습니다!");
             }
             else
@@ -123,26 +146,29 @@ namespace MyFirstApp
             }
         }
 
-        static void Monster(ref float playerHP, ref bool isDefending, ref float MonsterAK, ref int turnCount)
+        static void MonsterTurn(Unit player, Unit monster, ref bool isDefending, ref int turnCount)
         {
             Random random = new Random();
-            int attackDamage = random.Next((int)MonsterAK - 5, (int)MonsterAK + 5);
+            int attackDamage = random.Next((int)monster.AttackPower - 5, (int)monster.AttackPower + 5);
+
             if (isDefending)
             {
-                attackDamage /= 2; // 방어 상태에서는 받는 데미지 절반
+                attackDamage /= 2;
             }
-            playerHP -= attackDamage;
+
+            player.TakeDamage(attackDamage);
+
             if (isDefending)
             {
                 Console.WriteLine($"Monster가 공격했습니다 하지만 방어를 해 데미지가 1/2가 되었습니다. (데미지: {attackDamage})");
-                isDefending = false; // 방어 상태 해제
-                turnCount++;
+                isDefending = false;
             }
             else
             {
                 Console.WriteLine($"Monster가 공격했습니다 (데미지: {attackDamage})");
-                turnCount++;
             }
+
+            turnCount++;
         }
     }
 }
