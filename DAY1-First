@@ -90,7 +90,7 @@ namespace MyFirstApp
                 PlayerAK += 10;
                 Console.WriteLine("날카로운 포션을 사용하여 공격력이 증가했습니다.");
 
-                // 날카로운 포션 사용 시 즉시 몬스터 공격 로직 추가
+                
                 int attackDamage = random.Next((int)PlayerAK - 5, (int)PlayerAK - 2);
                 monsterHP -= attackDamage;
                 Console.WriteLine($"날카로운 포션의 효과로 몬스터에게 {attackDamage}의 데미지를 입혔습니다!");
