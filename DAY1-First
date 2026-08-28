@@ -1,0 +1,70 @@
+using System;
+
+namespace MyFirstApp
+{
+    internal class Program
+    {
+        static void Main(string[] args)
+        {
+            Console.WriteLine("GAME START");
+            float playerHP = 100;
+            float monsterHP = 100;
+
+            while (playerHP > 0 && monsterHP > 0)
+            {
+                Console.WriteLine("\n--------------------------------");
+                Console.WriteLine($"플레이어 HP: {playerHP} | 몬스터 HP: {monsterHP}");
+                Console.Write("공격 (A) / 회복 (H): ");
+
+                char choice = char.ToUpper(Console.ReadKey().KeyChar);
+                Console.WriteLine();
+
+                Player(choice, ref playerHP, ref monsterHP);
+
+                if (monsterHP > 0)
+                {
+                    Monster(ref playerHP);
+                }
+            }
+
+            if (playerHP <= 0)
+            {
+                Console.WriteLine("\n패배했습니다... GAME OVER");
+            }
+            else if (monsterHP <= 0)
+            {
+                Console.WriteLine("\n축하합니다! 몬스터를 처치했습니다!");
+            }
+        }
+
+        static void Player(char choice, ref float nowPlayerHP, ref float monsterHP)
+        {
+            Random random = new Random();
+
+            if (choice == 'A')
+            {
+                int attackDamage = random.Next(1, 11);
+                monsterHP -= attackDamage;
+                Console.WriteLine($"몬스터에게 {attackDamage}의 데미지를 입혔습니다");
+            }
+            else if (choice == 'H')
+            {
+                int healAmount = 10;
+                nowPlayerHP += healAmount;
+                Console.WriteLine($"체력을 {healAmount} 회복했습니다");
+            }
+            else
+            {
+                Console.WriteLine("잘못된 입력입니다.");
+            }
+        }
+
+        static void Monster(ref float playerHP)
+        {
+            Random random = new Random();
+            int attackDamage = random.Next(1, 10);
+            playerHP -= attackDamage;
+            Console.WriteLine($"Monster가 공격했습니다 (데미지: {attackDamage})");
+        }
+    }
+}
