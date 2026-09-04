@@ -20,7 +20,6 @@ namespace SchoolEscape.World
         {
             switch (BrickHP)
             {
-                
                 case 1:
                     _isUsed = false;
                     BrickHP--;
@@ -33,6 +32,7 @@ namespace SchoolEscape.World
                     Destroy(gameObject, _destroyDelay);
                     break;
             }
+
             if (_isUsed)
             {
                 return;
