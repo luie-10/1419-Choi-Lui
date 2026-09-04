@@ -6,6 +6,12 @@ namespace SchoolEscape.World
 {
     public sealed class StrongBrick : Brick
     {
+        private enum BrickState
+        {
+            Normal, // 기본
+            Damaged // 데미지 받았을 때
+        }
+
         [SerializeField]
         private SpriteRenderer _brickRenderer;
         [SerializeField]
@@ -14,18 +20,18 @@ namespace SchoolEscape.World
         private float _destroyDelay = 0.08f;
 
         private bool _isUsed;
-        private int BrickHP = 1;
+        private BrickState _currentState = BrickState.Normal;
 
         protected override void OnHitFromBelow(PlayerMotor playerMotor)
         {
-            switch (BrickHP)
+            switch (_currentState)
             {
-                case 1:
+                case BrickState.Normal:
                     _isUsed = false;
-                    BrickHP--;
+                    _currentState = BrickState.Damaged;
                     _brickRenderer.color = _usedColor;
                     break;
-                case 0:
+                case BrickState.Damaged:
                     _isUsed = true;
                     DisableCollision();
                     _brickRenderer.enabled = false;
